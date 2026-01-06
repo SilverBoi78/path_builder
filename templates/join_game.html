@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Join Game - Path Builder{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-8">
+    <div class="bg-gray-800 rounded-lg shadow-xl p-8">
+        <h2 class="text-3xl font-bold mb-6 text-center">Join Game</h2>
+        
+        <div class="mb-6 text-center">
+            <p class="text-lg mb-2">{{ game.player1.username }} has invited you to play!</p>
+            <p class="text-gray-400 text-sm">They are playing as 
+                <span class="font-semibold" style="color: {{ 'rgb(239, 68, 68)' if game.player1_color == 'red' else ('rgb(168, 85, 247)' if game.player1_color == 'purple' else 'rgb(59, 130, 246)') }}">
+                    {{ game.player1_color }}
+                </span>
+            </p>
+        </div>
+        
+        <form method="POST" action="{{ url_for('join_game', game_id=game.id) }}">
+            <div class="mb-6">
+                <label class="block text-sm font-medium mb-3">Choose Your Color</label>
+                <div class="space-y-3">
+                    {% if game.player1_color != 'red' %}
+                        <label class="flex items-center space-x-3 cursor-pointer p-3 bg-gray-700 rounded hover:bg-gray-600">
+                            <input type="radio" name="color" value="red" required class="w-4 h-4">
+                            <span class="flex items-center">
+                                <span class="w-8 h-8 bg-red-500 rounded mr-3"></span>
+                                Red
+                            </span>
+                        </label>
+                    {% endif %}
+                    
+                    {% if game.player1_color != 'purple' %}
+                        <label class="flex items-center space-x-3 cursor-pointer p-3 bg-gray-700 rounded hover:bg-gray-600">
+                            <input type="radio" name="color" value="purple" required class="w-4 h-4">
+                            <span class="flex items-center">
+                                <span class="w-8 h-8 bg-purple-500 rounded mr-3"></span>
+                                Purple
+                            </span>
+                        </label>
+                    {% endif %}
+                    
+                    {% if game.player1_color != 'blue' %}
+                        <label class="flex items-center space-x-3 cursor-pointer p-3 bg-gray-700 rounded hover:bg-gray-600">
+                            <input type="radio" name="color" value="blue" required class="w-4 h-4">
+                            <span class="flex items-center">
+                                <span class="w-8 h-8 bg-blue-500 rounded mr-3"></span>
+                                Blue
+                            </span>
+                        </label>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded">
+                Join Game
+            </button>
+        </form>
+        
+        <div class="mt-6 p-4 bg-gray-700 rounded">
+            <p class="text-sm text-gray-300">
+                <strong>Your Goal:</strong> Connect the left edge to the right edge
+            </p>
+            <p class="text-sm text-gray-300 mt-2">
+                <strong>Their Goal:</strong> Connect the top edge to the bottom edge
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

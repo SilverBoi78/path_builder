@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Game - Path Builder{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold mb-2">Game #{{ game.id }}</h1>
+        <div class="flex items-center space-x-6 text-lg">
+            <div class="flex items-center space-x-2">
+                <span class="w-4 h-4 rounded" style="background-color: {{ 'rgb(239, 68, 68)' if game.player1_color == 'red' else ('rgb(168, 85, 247)' if game.player1_color == 'purple' else 'rgb(59, 130, 246)') }}"></span>
+                <span>{{ game.player1.username }} (Top→Bottom)</span>
+            </div>
+            <span class="text-gray-500">vs</span>
+            <div class="flex items-center space-x-2">
+                {% if game.player2 %}
+                    <span class="w-4 h-4 rounded" style="background-color: {{ 'rgb(239, 68, 68)' if game.player2_color == 'red' else ('rgb(168, 85, 247)' if game.player2_color == 'purple' else 'rgb(59, 130, 246)') }}"></span>
+                    <span>{{ game.player2.username }} (Left→Right)</span>
+                {% else %}
+                    <span class="text-yellow-400">Waiting for opponent...</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div class="lg:col-span-3">
+            <div class="bg-gray-800 rounded-lg p-6">
+                {% if game.status == 'completed' %}
+                    <div class="mb-4 p-4 bg-green-600 rounded text-center text-xl font-bold">
+                        Game Over! {{ game.winner.username }} wins!
+                    </div>
+                {% elif game.status == 'waiting' %}
+                    <div class="mb-4 p-4 bg-yellow-600 rounded text-center text-xl font-bold">
+                        Waiting for {{ game.player1.username }} to join...
+                    </div>
+                {% elif game.current_turn == 1 and game.player1_id == current_user.id %}
+                    <div class="mb-4 p-4 bg-green-600 rounded text-center text-xl font-bold">
+                        Your Turn! Place 2 tiles
+                    </div>
+                {% elif game.current_turn == 2 and game.player2_id == current_user.id %}
+                    <div class="mb-4 p-4 bg-green-600 rounded text-center text-xl font-bold">
+                        Your Turn! Place 2 tiles
+                    </div>
+                {% else %}
+                    <div class="mb-4 p-4 bg-blue-600 rounded text-center text-xl font-bold">
+                        Opponent's Turn
+                    </div>
+                {% endif %}
+
+                <div id="board" class="inline-block bg-gray-900 p-2 rounded"></div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-1">
+            <div class="bg-gray-800 rounded-lg p-6 sticky top-8">
+                <h2 class="text-xl font-bold mb-4">Controls</h2>
+                
+                <div class="mb-6">
+                    <h3 class="font-semibold mb-2">Tile Type</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="radio" name="tileType" value="path" checked class="w-4 h-4">
+                            <span>Path (Your Color)</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="radio" name="tileType" value="block" class="w-4 h-4">
+                            <span>Block (Gray)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <p class="text-sm text-gray-400 mb-2">Tiles placed: <span id="tilesPlaced">0</span>/2</p>
+                    <button id="submitMove" disabled 
+                        class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded">
+                        Submit Move
+                    </button>
+                    <button id="clearSelection" 
+                        class="w-full mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        Clear Selection
+                    </button>
+                </div>
+
+                <div class="border-t border-gray-700 pt-4">
+                    <h3 class="font-semibold mb-2">How to Win</h3>
+                    <p class="text-sm text-gray-400 mb-2">
+                        {% if game.player1_id == current_user.id %}
+                            Connect top edge to bottom edge
+                        {% else %}
+                            Connect left edge to right edge
+                        {% endif %}
+                    </p>
+                    <p class="text-sm text-gray-400">
+                        Paths connect horizontally and vertically only (no diagonals)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const gameId = {{ game.id }};
+    const currentUserId = {{ current_user.id }};
+    const player1Id = {{ game.player1_id }};
+    const player2Id = {{ game.player2_id if game.player2_id else 'null' }};
+    const player1Color = '{{ game.player1_color }}';
+    const player2Color = '{{ game.player2_color if game.player2_color else "" }}';
+    const gameStatus = '{{ game.status }}';
+    let currentTurn = {{ game.current_turn }};
+    const boardData = {{ game.board_state | safe }};
+</script>
+<script src="{{ url_for('static', filename='js/game.js') }}"></script>
+{% endblock %}
