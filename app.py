@@ -104,7 +104,7 @@ def create_game():
             flash('Cannot play against yourself')
             return redirect(url_for('dashboard'))
         
-        game = Game(player1_id=current_user.id, player1_color=player_color)
+        game = Game(player1_id=current_user.id, player2_id=opponent.id, player1_color=player_color)
         db.session.add(game)
         db.session.commit()
         
